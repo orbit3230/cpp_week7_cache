@@ -20,7 +20,7 @@ double CachedRunner::multiply(string filename) {
     else {
         missesCount++;
         result = TaskRunner::multiply(filename);
-        cache.add(filename, result);
+        cache.add("multiply("+filename+")", result);
         return result;
     }
 }
@@ -36,7 +36,7 @@ int CachedRunner::palindrome(string filename) {
     else {
         missesCount++;
         result = TaskRunner::palindrome(filename);
-        cache.add(filename, result);
+        cache.add("palindrome("+filename+")", result);
         return result;
     }
 }

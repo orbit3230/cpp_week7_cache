@@ -59,8 +59,7 @@ Cache::~Cache() {
 void Cache::add(string key, int value) {
     // palindrome 데이터 캐시 노드 생성
     Node *newNode = new Node;
-    newNode->type = "palindrome";
-    newNode->filename = key;
+    newNode->key = key;
     newNode->intValue = value;
     newNode->next = NULL;
     newNode->prev = NULL;
@@ -71,8 +70,7 @@ void Cache::add(string key, int value) {
 void Cache::add(string key, double value) {
     // multiply 데이터 캐시 노드 생성
     Node *newNode = new Node;
-    newNode->type = "multiply";
-    newNode->filename = key;
+    newNode->key = key;
     newNode->doubleValue = value;
     newNode->next = NULL;
     newNode->prev = NULL;
@@ -84,7 +82,7 @@ bool Cache::get(string key, int &value) {
     Node *nextNode = tail;
     // 캐시 탐색
     while(nextNode != NULL) {
-        if(nextNode->filename == key) {
+        if(nextNode->key == key) {
             value = nextNode->intValue;
             usedCache(nextNode);  // 캐시를 사용했으므로 최근 사용(tail)로 이동
             return true;
@@ -98,7 +96,7 @@ bool Cache::get(string key, double &value) {
     Node *nextNode = tail;
     // 캐시 탐색
     while(nextNode != NULL) {
-        if(nextNode->filename == key) {
+        if(nextNode->key == key) {
             value = nextNode->doubleValue;
             usedCache(nextNode);  // 캐시를 사용했으므로 최근 사용(tail)로 이동
             return true;
@@ -113,12 +111,9 @@ string Cache::toString() {
     Node *nextNode = tail;
     while(true) {
         tostring += "[";
-        tostring += nextNode->type;
-        tostring += "(";
-        tostring += nextNode->filename;
-        tostring += ")";
+        tostring += nextNode->key;
         tostring += ": ";
-        if(nextNode->type == "palindrome") {  // palindrome 데이터 캐시
+        if(nextNode->key[0] == 'p') {  // palindrome 데이터 캐시
             tostring += to_string(nextNode->intValue);
         } 
         else {                                // multiply 데이터 캐시

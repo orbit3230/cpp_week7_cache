@@ -9,8 +9,7 @@ class Cache {
 private:
   // 캐시 노드
   struct Node {
-    std::string type;
-    std::string filename;
+    std::string key;
     int intValue;
     double doubleValue;
     Node *next; // 다음 노드를 가리키는 포인터
