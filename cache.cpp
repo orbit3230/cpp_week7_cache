@@ -113,7 +113,10 @@ string Cache::toString() {
     Node *nextNode = tail;
     while(true) {
         tostring += "[";
+        tostring += nextNode->type;
+        tostring += "(";
         tostring += nextNode->filename;
+        tostring += ")";
         tostring += ": ";
         if(nextNode->type == "palindrome") {  // palindrome 데이터 캐시
             tostring += to_string(nextNode->intValue);
