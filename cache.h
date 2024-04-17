@@ -4,6 +4,7 @@
 #include <string>
 
 #define CACHE_SIZE 10
+#define HASH_SIZE 31
 
 class Cache {
 private:
@@ -15,19 +16,32 @@ private:
     Node *next; // 다음 노드를 가리키는 포인터
     Node *prev; // 이전 노드를 가리키는 포인터
   };
-  // 캐시 테일 노드
-  Node *tail;
-  // 캐시 헤드 노드
-  Node *head;
+  struct ListNode {
+    Node *tail;
+    Node *head;
+  };
   // 캐시 리스트
-  Node *cacheList;
+  ListNode cacheList;
   // 현재 캐시 사이즈
   int currentSize;
+
+  // 해시 테이블
+  ListNode *hashTable;
 
   // 캐시 노드를 추가하는 함수
   void addCache(Node *newNode);
   // 캐시가 사용되었다면 tail로 보내는 함수
   void usedCache(Node *node);
+
+  // 해시 함수
+  int getHash(std::string key);
+  // 해시 테이블의 해당 해시 인덱스에 노드 추가
+  void addHashTable(int hash, Node *newNode);
+  // 해시 테이블의 해당 해시 인덱스에서 제거할 노드를 찾아 제거
+  void removeHashTable(int hash, std::string key);
+  // 해시 탐색 함수(value를 저장하고, 찾은 노드를 반환)
+  Node* searchHashTable(int hash, std::string key, int &value);
+  Node* searchHashTable(int hash, std::string key, double &value);
 
 public:
   Cache();
