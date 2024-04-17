@@ -1,18 +1,13 @@
 #include "cache.h"
-#include <iostream>
+#include <sstream>
 using namespace std;
 
 void Cache::addCache(Node *newNode) {
-    cout << "test2\n";  // 디버깅용
-    cout << newNode->filename << endl;  // 디버깅용
     // 첫 캐시 추가는 따로 처리
     if(currentSize == 0) {
         head = newNode;
         tail = newNode;
         currentSize++;
-        cout << "test3\n";  // 디버깅용
-        cout << head->filename << endl;  // 디버깅용
-        cout << tail->filename << endl;  // 디버깅용
         return;
     }
     // 캐시가 가득 찼다면, 가장 오래전에 사용된 캐시(head) 제거
@@ -26,8 +21,8 @@ void Cache::addCache(Node *newNode) {
     newNode->next = tail;
     tail = newNode;
 
-    currentSize++;
-    cout << "test3\n";  // 디버깅용
+    if(currentSize < CACHE_SIZE)
+        currentSize++;
 }
 
 void Cache::usedCache(Node *node) {
@@ -69,8 +64,6 @@ void Cache::add(string key, int value) {
     newNode->intValue = value;
     newNode->next = NULL;
     newNode->prev = NULL;
-    cout << "test1\n";  // 디버깅용
-    cout << newNode->filename << endl;  // 디버깅용
 
     addCache(newNode);
 }
@@ -83,7 +76,6 @@ void Cache::add(string key, double value) {
     newNode->doubleValue = value;
     newNode->next = NULL;
     newNode->prev = NULL;
-    cout << "test1\n";  // 디버깅용
 
     addCache(newNode);
 }
@@ -117,22 +109,19 @@ bool Cache::get(string key, double &value) {
 }
 
 string Cache::toString() {
-    cout << "test4\n";  // 디버깅용
     string tostring = "";
     Node *nextNode = tail;
-    cout << nextNode->intValue << endl;  // 디버깅용
     while(true) {
         tostring += "[";
-        cout << tostring << endl;  // 디버깅용
-        cout << nextNode->filename << endl;  // 디버깅용
         tostring += nextNode->filename;
         tostring += ": ";
-        cout << nextNode->type << endl;  // 디버깅용
         if(nextNode->type == "palindrome") {  // palindrome 데이터 캐시
             tostring += to_string(nextNode->intValue);
         } 
         else {                                // multiply 데이터 캐시
-            tostring += to_string(nextNode->doubleValue);
+            ostringstream ss;
+            ss << nextNode->doubleValue;
+            tostring += ss.str();
         }
         tostring += "]";
         if(nextNode->next != NULL) {
@@ -142,6 +131,6 @@ string Cache::toString() {
         else
             break;
     }
-    cout << "test5\n";  // 디버깅용
+    tostring += "\n";
     return tostring;
 }

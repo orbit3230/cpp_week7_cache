@@ -7,28 +7,28 @@
 
 class Cache {
 private:
-// 캐시 노드
-struct Node { 
-  std::string type;
-  std::string filename;
-  int intValue;
-  double doubleValue;
-  Node *next;  // 다음 노드를 가리키는 포인터
-  Node *prev;  // 이전 노드를 가리키는 포인터
-};
-// 캐시 테일 노드
-Node *tail;
-// 캐시 헤드 노드
-Node *head;
-// 캐시 리스트
-Node *cacheList;
-// 현재 캐시 사이즈
-int currentSize;
+  // 캐시 노드
+  struct Node {
+    std::string type;
+    std::string filename;
+    int intValue;
+    double doubleValue;
+    Node *next; // 다음 노드를 가리키는 포인터
+    Node *prev; // 이전 노드를 가리키는 포인터
+  };
+  // 캐시 테일 노드
+  Node *tail;
+  // 캐시 헤드 노드
+  Node *head;
+  // 캐시 리스트
+  Node *cacheList;
+  // 현재 캐시 사이즈
+  int currentSize;
 
-// 캐시 노드를 추가하는 함수
-void addCache(Node *newNode);
-// 캐시가 사용되었다면 tail로 보내는 함수
-void usedCache(Node *node);
+  // 캐시 노드를 추가하는 함수
+  void addCache(Node *newNode);
+  // 캐시가 사용되었다면 tail로 보내는 함수
+  void usedCache(Node *node);
 
 public:
   Cache();

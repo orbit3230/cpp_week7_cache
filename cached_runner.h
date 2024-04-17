@@ -6,7 +6,7 @@
 
 class CachedRunner {
 private:
-  Cache cache;
+  Cache& cache;
   int hitsCount;   // 히트 횟수
   int missesCount; // 미스 횟수
 

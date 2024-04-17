@@ -2,8 +2,9 @@
 #include "task_runner.h"
 using namespace std;
 
-CachedRunner::CachedRunner(Cache &cache) {
-    this->cache = cache;
+// 참조 변수 Cache& cache는 initializer list로 초기화
+// const와 비슷한 느낌으로 생성 후 변경되지 않아야 하기 때문인듯
+CachedRunner::CachedRunner(Cache &cache) : cache(cache) {
     hitsCount = 0;
     missesCount = 0;
 }
