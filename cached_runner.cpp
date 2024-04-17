@@ -10,9 +10,10 @@ CachedRunner::CachedRunner(Cache &cache) : cache(cache) {
 }
 
 double CachedRunner::multiply(string filename) {
+    string key = "multiply("+filename+")";
     double result;
     // get 함수가 true를 반환했다면, result에 캐시에서 찾은 값이 들어가 있을 것
-    if(cache.get(filename, result)) {
+    if(cache.get(key, result)) {
         hitsCount++;
         return result;
     }
@@ -20,15 +21,16 @@ double CachedRunner::multiply(string filename) {
     else {
         missesCount++;
         result = TaskRunner::multiply(filename);
-        cache.add("multiply("+filename+")", result);
+        cache.add(key, result);
         return result;
     }
 }
 
 int CachedRunner::palindrome(string filename) {
+    string key = "palindrome("+filename+")";
     int result;
     // get 함수가 true를 반환했다면, result에 캐시에서 찾은 값이 들어가 있을 것
-    if(cache.get(filename, result)) {
+    if(cache.get(key, result)) {
         hitsCount++;
         return result;
     }
@@ -36,7 +38,7 @@ int CachedRunner::palindrome(string filename) {
     else {
         missesCount++;
         result = TaskRunner::palindrome(filename);
-        cache.add("palindrome("+filename+")", result);
+        cache.add(key, result);
         return result;
     }
 }
