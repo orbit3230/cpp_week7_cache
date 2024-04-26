@@ -13,18 +13,25 @@ void Cache::addCache(Node *newNode) {
     }
     // 캐시가 가득 찼다면, 가장 오래전에 사용된 캐시(head) 제거
     if(currentSize == CACHE_SIZE) {
+        // debugging
+        cout << "Cache is full (" << currentSize << "). Remove the oldest cache." << endl;
         Node *temp = cacheList.head;
         cacheList.head = cacheList.head->prev;
         cacheList.head->next = NULL;
         removeHashTable(getHash(temp->key), temp->key);
         delete temp;
+        currentSize--;
     }
+    
     cacheList.tail->prev = newNode;
     newNode->next = cacheList.tail;
+    newNode->prev = NULL;
     cacheList.tail = newNode;
 
-    if(currentSize < CACHE_SIZE) 
-        currentSize++;
+    currentSize++;
+
+    // debugging
+    cout << "now size: " << currentSize << endl;
 }
 
 void Cache::usedCache(Node *node) {
@@ -32,7 +39,7 @@ void Cache::usedCache(Node *node) {
     else {
         // 노드 연결 제거
         if(node->next == NULL) {  // head 라면 따로 처리
-            cacheList.head = cacheList.head->prev;
+            cacheList.head = node->prev;
             cacheList.head->next = NULL;
         } 
         else {  // tail도 head도 아닌 그 중간 이라면
@@ -50,9 +57,11 @@ void Cache::usedCache(Node *node) {
 int Cache::getHash(string key) {
     int hash = 0;
     for(int i = 0; i < key.length(); i++)
-        // 분배법칙에 따라 매번 모듈러 연산을 하여도 결과는 같음.
-        // 이렇게 하면 오버플로우 방지 가능
-        hash = (hash * 31 + key[i]) % HASH_SIZE;
+        hash = hash + key[i];
+    
+    hash = hash % HASH_SIZE;
+    // debugging
+    cout << "hash: " << hash << endl;
     return hash;
 }
 
@@ -61,12 +70,15 @@ void Cache::addHashTable(int hash, Node *newNode) {
     if(hashTable[hash].head == NULL) {
         hashTable[hash].head = newNode;
         hashTable[hash].tail = newNode;
+        newNode->next = NULL;
+        newNode->prev = NULL;
     }
     // 그렇지 않고 하나라도 있다면
     else {
         hashTable[hash].tail->prev = newNode;
         newNode->next = hashTable[hash].tail;
         hashTable[hash].tail = newNode;
+        newNode->prev = NULL;
     }
 }
 
@@ -79,7 +91,7 @@ void Cache::removeHashTable(int hash, string key) {
                 hashTable[hash].tail->prev = NULL;
             }
             else if(nextNode->next == NULL) {  // head 라면
-                hashTable[hash].head = hashTable[hash].head->next;
+                hashTable[hash].head = hashTable[hash].head->prev;
                 hashTable[hash].head->next = NULL;
             }
             else {  // head도 tail도 아닌 중간 노드라면
@@ -95,7 +107,7 @@ void Cache::removeHashTable(int hash, string key) {
 
 Cache::Node* Cache::searchHashTable(int hash, string key, int &value) {
     Node *nextNode = hashTable[hash].tail;
-    if(nextNode == NULL) return nullptr;  // 해당 해시 인덱스에 아무것도 없으면, 등록이 안 되어 있는 것.
+    if(nextNode == NULL) return NULL;  // 해당 해시 인덱스에 아무것도 없으면, 등록이 안 되어 있는 것.
     while(nextNode != NULL) {    // 해시 충돌이 없었더라도 확인은 해야함
         if(nextNode->key == key) {
             value = nextNode->intValue;
@@ -103,11 +115,11 @@ Cache::Node* Cache::searchHashTable(int hash, string key, int &value) {
         }
         nextNode = nextNode->next;
     }
-    return nullptr;  // 해시 값은 같았으나, key가 다른 경우
+    return NULL;  // 해시 값은 같았으나, key가 다른 경우
 }
 Cache::Node* Cache::searchHashTable(int hash, string key, double &value) {
     Node *nextNode = hashTable[hash].tail;
-    if(nextNode == NULL) return nullptr;  // 해당 해시 인덱스에 아무것도 없으면, 등록이 안 되어 있는 것.
+    if(nextNode == NULL) return NULL;  // 해당 해시 인덱스에 아무것도 없으면, 등록이 안 되어 있는 것.
     while(nextNode != NULL) {    // 해시 충돌이 없었더라도 확인은 해야함
         if(nextNode->key == key) {
             value = nextNode->doubleValue;
@@ -115,7 +127,7 @@ Cache::Node* Cache::searchHashTable(int hash, string key, double &value) {
         }
         nextNode = nextNode->next;
     }
-    return nullptr;  // 해시 값은 같았으나, key가 다른 경우
+    return NULL;  // 해시 값은 같았으나, key가 다른 경우
 }
 
 Cache::Cache() {
@@ -163,7 +175,7 @@ void Cache::add(string key, double value) {
 bool Cache::get(string key, int &value) {
     int hash = getHash(key);
     Node* finding = searchHashTable(hash, key, value);
-    if(finding != nullptr) {
+    if(finding != NULL) {
         usedCache(finding);  // 캐시를 사용했으므로 최근 사용(tail)로 이동
         return true;
     }
@@ -173,7 +185,7 @@ bool Cache::get(string key, int &value) {
 bool Cache::get(string key, double &value) {
     int hash = getHash(key);
     Node* finding = searchHashTable(hash, key, value);
-    if(finding != nullptr) {
+    if(finding != NULL) {
         usedCache(finding);  // 캐시를 사용했으므로 최근 사용(tail)로 이동
         return true;
     }

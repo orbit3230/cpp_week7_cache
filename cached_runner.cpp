@@ -3,7 +3,7 @@
 using namespace std;
 
 // 참조 변수 Cache& cache는 initializer list로 초기화
-// const와 비슷한 느낌으로 생성 후 변경되지 않아야 하기 때문인듯
+// 만들어질 때 초기화, 즉 선언과 동시에 초기화하기 위함
 CachedRunner::CachedRunner(Cache &cache) : cache(cache) {
     hitsCount = 0;
     missesCount = 0;
