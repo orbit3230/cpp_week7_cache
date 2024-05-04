@@ -15,6 +15,8 @@ private:
     double doubleValue;
     Node *next; // 다음 노드를 가리키는 포인터
     Node *prev; // 이전 노드를 가리키는 포인터
+    Node *nextHash; // 다음 "해시" 노드를 가리키는 포인터
+    Node *prevHash; // 이전 "해시" 노드를 가리키는 포인터
   };
   // 캐시 노드 리스트
   struct ListNode {

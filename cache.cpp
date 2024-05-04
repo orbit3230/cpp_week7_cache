@@ -13,8 +13,6 @@ void Cache::addCache(Node *newNode) {
     }
     // 캐시가 가득 찼다면, 가장 오래전에 사용된 캐시(head) 제거
     if(currentSize == CACHE_SIZE) {
-        // debugging
-        cout << "Cache is full (" << currentSize << "). Remove the oldest cache." << endl;
         Node *temp = cacheList.head;
         cacheList.head = cacheList.head->prev;
         cacheList.head->next = NULL;
@@ -22,16 +20,12 @@ void Cache::addCache(Node *newNode) {
         delete temp;
         currentSize--;
     }
-    
     cacheList.tail->prev = newNode;
     newNode->next = cacheList.tail;
     newNode->prev = NULL;
     cacheList.tail = newNode;
 
     currentSize++;
-
-    // debugging
-    cout << "now size: " << currentSize << endl;
 }
 
 void Cache::usedCache(Node *node) {
@@ -56,12 +50,11 @@ void Cache::usedCache(Node *node) {
 
 int Cache::getHash(string key) {
     int hash = 0;
-    for(int i = 0; i < key.length(); i++)
-        hash = hash + key[i];
-    
+    int len = key.length();
+    // 내가 만든 해시 함수
+    // 끝에서 6번째(파일의 숫자 부분)과, 8번째 (e/y)를 더한 해시값 % HASH_SIZE(31-소수)
+    hash += key[len-6] + key[len-8];
     hash = hash % HASH_SIZE;
-    // debugging
-    cout << "hash: " << hash << endl;
     return hash;
 }
 
@@ -70,15 +63,15 @@ void Cache::addHashTable(int hash, Node *newNode) {
     if(hashTable[hash].head == NULL) {
         hashTable[hash].head = newNode;
         hashTable[hash].tail = newNode;
-        newNode->next = NULL;
-        newNode->prev = NULL;
+        newNode->nextHash = NULL;
+        newNode->prevHash = NULL;
     }
     // 그렇지 않고 하나라도 있다면
     else {
-        hashTable[hash].tail->prev = newNode;
-        newNode->next = hashTable[hash].tail;
+        hashTable[hash].tail->prevHash = newNode;
+        newNode->nextHash = hashTable[hash].tail;
         hashTable[hash].tail = newNode;
-        newNode->prev = NULL;
+        newNode->prevHash = NULL;
     }
 }
 
@@ -86,22 +79,27 @@ void Cache::removeHashTable(int hash, string key) {
     Node *nextNode = hashTable[hash].tail;
     while(nextNode != NULL) {
         if(nextNode->key == key) {
-            if(nextNode->prev == NULL) {  // tail 이라면
-                hashTable[hash].tail = hashTable[hash].tail->next;
-                hashTable[hash].tail->prev = NULL;
+            // tail이면서 head 일 경우 별도 처리 (단 하나의 노드)
+            if(nextNode->nextHash == NULL && nextNode->prevHash == NULL) {
+                hashTable[hash].head = NULL;
+                hashTable[hash].tail = NULL;
+            }
+            else if(nextNode->prevHash == NULL) {  // tail 이라면
+                hashTable[hash].tail = hashTable[hash].tail->nextHash;
+                hashTable[hash].tail->prevHash = NULL;
             }
             else if(nextNode->next == NULL) {  // head 라면
-                hashTable[hash].head = hashTable[hash].head->prev;
-                hashTable[hash].head->next = NULL;
+                hashTable[hash].head = hashTable[hash].head->prevHash;
+                hashTable[hash].head->nextHash = NULL;
             }
             else {  // head도 tail도 아닌 중간 노드라면
-                nextNode->prev->next = nextNode->next;
-                nextNode->next->prev = nextNode->prev;
+                nextNode->prevHash->nextHash = nextNode->nextHash;
+                nextNode->nextHash->prevHash = nextNode->prevHash;
             }
             delete nextNode;
             break;
         }
-        nextNode = nextNode->next;
+        nextNode = nextNode->nextHash;
     }
 }
 
@@ -113,7 +111,7 @@ Cache::Node* Cache::searchHashTable(int hash, string key, int &value) {
             value = nextNode->intValue;
             return nextNode;
         }
-        nextNode = nextNode->next;
+        nextNode = nextNode->nextHash;
     }
     return NULL;  // 해시 값은 같았으나, key가 다른 경우
 }
@@ -125,7 +123,7 @@ Cache::Node* Cache::searchHashTable(int hash, string key, double &value) {
             value = nextNode->doubleValue;
             return nextNode;
         }
-        nextNode = nextNode->next;
+        nextNode = nextNode->nextHash;
     }
     return NULL;  // 해시 값은 같았으나, key가 다른 경우
 }
@@ -147,12 +145,14 @@ Cache::~Cache() {
 }
 
 void Cache::add(string key, int value) {
-    // palindrome 데이터 캐시 노드 생성
+    // palindrome 데이터 캐시 노드 생성 및 초기화
     Node *newNode = new Node;
     newNode->key = key;
     newNode->intValue = value;
     newNode->next = NULL;
     newNode->prev = NULL;
+    newNode->nextHash = NULL;
+    newNode->prevHash = NULL;
 
     addCache(newNode);
     int hash = getHash(key);
@@ -160,12 +160,14 @@ void Cache::add(string key, int value) {
 }
 
 void Cache::add(string key, double value) {
-    // multiply 데이터 캐시 노드 생성
+    // multiply 데이터 캐시 노드 생성 및 초기화
     Node *newNode = new Node;
     newNode->key = key;
     newNode->doubleValue = value;
     newNode->next = NULL;
     newNode->prev = NULL;
+    newNode->nextHash = NULL;
+    newNode->prevHash = NULL;
 
     addCache(newNode);
     int hash = getHash(key);
